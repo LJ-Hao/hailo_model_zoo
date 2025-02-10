@@ -15,7 +15,7 @@ from hailo_model_zoo.core.hn_editor.channel_transpose import bgr2rgb
 from hailo_model_zoo.core.hn_editor.layer_splitter import LayerSplitter
 from hailo_model_zoo.core.hn_editor.network_chainer import integrate_postprocessing
 from hailo_model_zoo.core.hn_editor.normalization_folding import fold_normalization
-from hailo_model_zoo.core.infer import infer_factory
+# from hailo_model_zoo.core.infer import infer_factory
 from hailo_model_zoo.core.info_utils import get_network_info  # noqa (F401) - exports this function for backwards compat
 from hailo_model_zoo.core.postprocessing import postprocessing_factory
 from hailo_model_zoo.core.preprocessing import preprocessing_factory
@@ -482,118 +482,118 @@ def get_infer_type(network_info, use_lite_inference):
     return final_infer_type
 
 
-def make_infer_callback(network_info, use_lite_inference):
-    infer_type = get_infer_type(network_info, use_lite_inference)
-    infer_callback = infer_factory.get_infer(infer_type)
+# def make_infer_callback(network_info, use_lite_inference):
+#     infer_type = get_infer_type(network_info, use_lite_inference)
+#     infer_callback = infer_factory.get_infer(infer_type)
 
-    return infer_callback
-
-
-def infer_model_tf2(
-    runner,
-    network_info,
-    target,
-    logger,
-    eval_num_examples,
-    data_path,
-    batch_size,
-    print_num_examples=256,
-    visualize_results=False,
-    video_outpath=None,
-    use_lite_inference=False,
-    dump_results=False,
-    input_conversion_args=None,
-    resize_args=None,
-    show_results_per_class=False,
-):
-    logger.info("Initializing the dataset ...")
-    if eval_num_examples:
-        eval_num_examples = eval_num_examples + network_info.evaluation.data_count_offset
-    preproc_callback = make_preprocessing(runner, network_info, input_conversion_args, resize_args)
-    # we do not pass batch_size, batching is now done in infer_callback
-    dataset = make_evalset_callback(network_info, preproc_callback, data_path)
-    # TODO refactor
-    postprocessing_callback = get_postprocessing_callback(runner, network_info)
-    eval_callback = make_eval_callback(network_info, runner, show_results_per_class, logger)
-    visualize_callback = make_visualize_callback(network_info) if visualize_results else None
-
-    model_wrapper_callback = make_model_callback(network_info)
-    infer_callback = make_infer_callback(network_info, use_lite_inference)
-    return infer_callback(
-        runner,
-        target,
-        logger,
-        eval_num_examples,
-        print_num_examples,
-        batch_size,
-        dataset,
-        postprocessing_callback,
-        eval_callback,
-        visualize_callback,
-        model_wrapper_callback,
-        video_outpath,
-        dump_results,
-        results_path=None,
-    )
+#     return infer_callback
 
 
-def infer_model_tf1(
-    runner,
-    network_info,
-    target,
-    logger,
-    eval_num_examples,
-    data_path,
-    batch_size,
-    print_num_examples=256,
-    visualize_results=False,
-    video_outpath=None,
-    dump_results=False,
-    network_groups=None,
-    show_results_per_class=False,
-):
-    logger.info("Initializing the dataset ...")
-    if eval_num_examples:
-        eval_num_examples = eval_num_examples + network_info.evaluation.data_count_offset
-    preproc_callback = make_preprocessing(runner, network_info)
-    data_feed_callback = make_evalset_callback(
-        network_info, preproc_callback, data_path, return_iterator_cb=True, batch_size=batch_size
-    )
+# def infer_model_tf2(
+#     runner,
+#     network_info,
+#     target,
+#     logger,
+#     eval_num_examples,
+#     data_path,
+#     batch_size,
+#     print_num_examples=256,
+#     visualize_results=False,
+#     video_outpath=None,
+#     use_lite_inference=False,
+#     dump_results=False,
+#     input_conversion_args=None,
+#     resize_args=None,
+#     show_results_per_class=False,
+# ):
+#     logger.info("Initializing the dataset ...")
+#     if eval_num_examples:
+#         eval_num_examples = eval_num_examples + network_info.evaluation.data_count_offset
+#     preproc_callback = make_preprocessing(runner, network_info, input_conversion_args, resize_args)
+#     # we do not pass batch_size, batching is now done in infer_callback
+#     dataset = make_evalset_callback(network_info, preproc_callback, data_path)
+#     # TODO refactor
+#     postprocessing_callback = get_postprocessing_callback(runner, network_info)
+#     eval_callback = make_eval_callback(network_info, runner, show_results_per_class, logger)
+#     visualize_callback = make_visualize_callback(network_info) if visualize_results else None
 
-    def tf_graph_callback(preprocessed_data, rescale_output=None):
-        sdk_export = runner.get_tf_graph(
-            target,
-            preprocessed_data,
-            use_preloaded_compilation=True,
-            network_groups=network_groups,
-            rescale_output=rescale_output,
-        )
+#     model_wrapper_callback = make_model_callback(network_info)
+#     infer_callback = make_infer_callback(network_info, use_lite_inference)
+#     return infer_callback(
+#         runner,
+#         target,
+#         logger,
+#         eval_num_examples,
+#         print_num_examples,
+#         batch_size,
+#         dataset,
+#         postprocessing_callback,
+#         eval_callback,
+#         visualize_callback,
+#         model_wrapper_callback,
+#         video_outpath,
+#         dump_results,
+#         results_path=None,
+#     )
 
-        return sdk_export
 
-    postprocessing_callback = get_postprocessing_callback(runner, network_info)
-    eval_callback = make_eval_callback(network_info, runner, show_results_per_class, logger)
-    visualize_callback = make_visualize_callback(network_info) if visualize_results else None
+# def infer_model_tf1(
+#     runner,
+#     network_info,
+#     target,
+#     logger,
+#     eval_num_examples,
+#     data_path,
+#     batch_size,
+#     print_num_examples=256,
+#     visualize_results=False,
+#     video_outpath=None,
+#     dump_results=False,
+#     network_groups=None,
+#     show_results_per_class=False,
+# ):
+#     logger.info("Initializing the dataset ...")
+#     if eval_num_examples:
+#         eval_num_examples = eval_num_examples + network_info.evaluation.data_count_offset
+#     preproc_callback = make_preprocessing(runner, network_info)
+#     data_feed_callback = make_evalset_callback(
+#         network_info, preproc_callback, data_path, return_iterator_cb=True, batch_size=batch_size
+#     )
 
-    infer_type = network_info.evaluation.infer_type
-    infer_callback = infer_factory.get_infer(infer_type)
+#     def tf_graph_callback(preprocessed_data, rescale_output=None):
+#         sdk_export = runner.get_tf_graph(
+#             target,
+#             preprocessed_data,
+#             use_preloaded_compilation=True,
+#             network_groups=network_groups,
+#             rescale_output=rescale_output,
+#         )
 
-    return infer_callback(
-        runner,
-        target,
-        logger,
-        eval_num_examples,
-        print_num_examples,
-        batch_size,
-        data_feed_callback,
-        tf_graph_callback,
-        postprocessing_callback,
-        eval_callback,
-        visualize_callback,
-        video_outpath,
-        dump_results,
-        results_path=None,
-    )
+#         return sdk_export
+
+#     postprocessing_callback = get_postprocessing_callback(runner, network_info)
+#     eval_callback = make_eval_callback(network_info, runner, show_results_per_class, logger)
+#     visualize_callback = make_visualize_callback(network_info) if visualize_results else None
+
+#     infer_type = network_info.evaluation.infer_type
+#     infer_callback = infer_factory.get_infer(infer_type)
+
+#     return infer_callback(
+#         runner,
+#         target,
+#         logger,
+#         eval_num_examples,
+#         print_num_examples,
+#         batch_size,
+#         data_feed_callback,
+#         tf_graph_callback,
+#         postprocessing_callback,
+#         eval_callback,
+#         visualize_callback,
+#         video_outpath,
+#         dump_results,
+#         results_path=None,
+# )
 
 
 def get_hef_path(results_dir, model_name):

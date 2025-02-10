@@ -38,10 +38,10 @@ if cpu_flags is not None and "avx" not in cpu_flags:
 
 def main():
     reqs = [
-        "numba",
+        "numba==0.60.0",
         "imageio==2.22.4",
         "matplotlib",
-        "numpy",
+        "numpy==1.23.3",
         "opencv-python",
         "scipy",
         "scikit-learn",
